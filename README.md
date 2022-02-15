@@ -1,2 +1,1 @@
-# SP_coursework
-Course work on the academic subject System Programming
+# Курсовая работа по Системному Программированию
