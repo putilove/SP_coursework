@@ -1,22 +1,7 @@
-#include <iostream>
-#include <thread>
-#include <vector>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <netdb.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <time.h>
+#include "ScanPorts.h"
 
-using namespace std;
-
-static bool port_is_open(string ip, int port){
+static bool port_is_open(std::string ip, int port)
+{
 
 	struct sockaddr_in addr_s;
     const char* addr = ip.c_str();
@@ -84,19 +69,18 @@ static bool port_is_open(string ip, int port){
 	return false;
 }
 
-
 void task(std::string ip, int port)
 {
     if (port_is_open(ip, port))
     {
-        cout << "MyNC: connection to " << ip << " port " << port << " succeeded.\n";
+        std::cout << "MyNC: connection to " << ip << " port " << port << " succeeded.\n";
     }
 }
 
 void scanPorts(std::string ip, int portInit, int portEnd)
 {
+    std::cout << "MyNC: Port scanning for IP" << ip << " " << portInit << "-" << portEnd << std::endl;            
 	std::vector<std::thread *> tasks;
-    
     for (int i = portInit; i < portEnd; i++)
     {    
         tasks.push_back(new std::thread(task, ip, i));
@@ -107,8 +91,10 @@ void scanPorts(std::string ip, int portInit, int portEnd)
     }
 }
 
-int main(int argc, char **argv){
-    cout << "MyNC: Port scanning for IP 82.179.48.251 1-1000" << endl;            
-    scanPorts("82.179.48.251", 1, 1000);
-    return 0;
+void scanPort(std::string ip, int port)
+{
+    std::cout << "MyNC: Port scanning for IP 82.179.48.251" << " " << port << std::endl;            
+    auto scanTask = new std::thread(task, ip, port);
+    scanTask->join();
+    return;
 }
