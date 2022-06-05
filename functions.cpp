@@ -6,6 +6,58 @@ std::ifstream::pos_type filesize(std::string file_name)
     return in.tellg();
 }
 
+void connectUDP(std::string ip, int port, bool isFileMessage)
+{
+    sockaddr_in addr;
+    memset(&addr, 0, sizeof(sockaddr_in));
+    addr.sin_addr.s_addr = inet_addr(ip.c_str());
+    addr.sin_port = htons(port);
+    addr.sin_family = AF_INET;
+
+    int s_client = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    while (true)
+    {
+        if (isFileMessage)
+        {
+            std::string path;
+            std::cout << "Enter file name: ";
+            std::cin >> path;
+            std::cout << "filename: " << path << std::endl;
+            std::fstream file;
+            file.open(path, std::ios_base::in | std::ios_base::binary);
+
+            if (file.is_open())
+            {
+                int file_size = filesize(path);
+                char *bytes = new char[file_size];
+                file.read((char *)bytes, file_size);
+
+                std::cout << "size: " << file_size << std::endl;
+                std::cout << "name: " << path << std::endl;
+                std::cout << "data: " << bytes << std::endl;
+
+                sendto(s_client, (char *)std::to_string(file_size).c_str(), 16, 0, (const sockaddr *)&addr, sizeof(addr));
+                sendto(s_client, (char *)path.c_str(), 32, 0, (const sockaddr *)&addr, sizeof(addr));
+                sendto(s_client, (char *)bytes, file_size, 0, (const sockaddr *)&addr, sizeof(addr));
+            }
+            else
+            {
+                std::cout << "Error opening file" << std::endl;
+            }
+            file.close();
+        }
+        else
+        {
+            std::string msg;
+            std::cin >> msg;
+            size_t msglen = msg.length();
+            char message[msglen] = "\0";
+            strcpy(message, msg.c_str());
+            sendto(s_client, (char *)message, msglen, 0, (const sockaddr *)&addr, sizeof(addr));
+        }
+    }
+}
+
 void connectTCP(std::string ip, int port, bool isFileMessage)
 {
     sockaddr_in addr;
