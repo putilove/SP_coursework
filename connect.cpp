@@ -20,9 +20,7 @@ void connect(std::string ip, int port)
                 std::cin >> msg;
                 char message[1024];
                 strcpy(message, msg.c_str());
-                if(send(s_client, (char*)&message, sizeof(message), 0) > 0){
-                    //std::cout << "Sended" << std::endl;
-                }
+                send(s_client, (char*)&message, sizeof(message), 0);
             }
         }
         else{
