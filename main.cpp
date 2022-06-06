@@ -31,6 +31,11 @@ int main(int argc, char *argv[])
             std::cout << "listen udp redirect" << std::endl;
             listeningUDP(atoi(argv[2]), false, atoi(argv[3]));
         }
+        else if (strcmp(argv[1], "-cuf") == 0)
+        {
+            std::cout << "connect udp file" << std::endl;
+            connectUDP(std::string(argv[2]), atoi(argv[3]), true);
+        }
         else if (strcmp(argv[1], "-cu") == 0)
         {
             std::cout << "connect udp" << std::endl;
