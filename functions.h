@@ -22,6 +22,8 @@
 
 void connectTCP(std::string ip, int host, bool isFileMessage);
 
+void listeningUDP(int srcPort, bool isFileMessage, int dstPort);
+
 void connectUDP(std::string ip, int port, bool isFileMessage);
 
 std::ifstream::pos_type filesize(std::string file_name);

@@ -6,6 +6,91 @@ std::ifstream::pos_type filesize(std::string file_name)
     return in.tellg();
 }
 
+void listeningUDP(int srcPort, bool isFileMessage, int dstPort)
+{
+    int listening_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+    sockaddr_in address{};
+
+    address.sin_family = AF_INET;
+    address.sin_port = htons(srcPort);
+    address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+
+    bind(listening_socket, (sockaddr *)&address, sizeof(address));
+
+    socklen_t len;
+    std::cout << "MyNC: Start listening UDP " << srcPort << std::endl;
+    int sock_fd = 0;
+
+    while (true)
+    {
+        if (isFileMessage)
+        {
+            char file_size_str[16];
+            char file_name[32];
+            int file_size;
+            recvfrom(listening_socket, (char *)file_size_str, 16, MSG_WAITALL, 0, &len);
+            file_size = atoi(file_size_str);
+            recvfrom(listening_socket, (char *)file_name, 32, MSG_WAITALL, 0, &len);
+            char *bytes = new char[file_size];
+            recvfrom(listening_socket, (char *)bytes, file_size, MSG_WAITALL, 0, &len);
+
+            std::cout << "size of file: " << file_size << std::endl;
+            std::cout << "name of file: " << file_name << std::endl;
+            if (dstPort != -1)
+            {
+                int s_client = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+                sockaddr_in dstAddress;
+                memset(&dstAddress, 0, sizeof(sockaddr_in));
+                dstAddress.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+                dstAddress.sin_port = htons(dstPort);
+                dstAddress.sin_family = AF_INET;
+
+                sendto(s_client, (char *)std::to_string(file_size).c_str(), 16, 0, (const sockaddr *)&dstAddress, sizeof(dstAddress));
+                sendto(s_client, (char *)file_name, 32, 0, (const sockaddr *)&dstAddress, sizeof(dstAddress));
+                sendto(s_client, (char *)bytes, file_size, 0, (const sockaddr *)&dstAddress, sizeof(dstAddress));
+            }
+            else
+            {
+                std::ofstream ofs("accepted/" + std::string(file_name)); //создать
+                ofs.close();
+                std::fstream file;
+                file.open("accepted/" + std::string(file_name), std::ios_base::out | std::ios_base::binary);
+                if (file.is_open())
+                {
+                    std::cout << "data: " << bytes << std::endl;
+                    file.write(bytes, file_size);
+                    std::cout << "ok.save" << std::endl;
+                }
+            }
+        }
+        else
+        {
+            char message[1024] = "\0";
+            socklen_t len;
+            int sizeOfRecv = recvfrom(listening_socket, (char *)message, 1024, MSG_WAITALL, 0, &len);
+            if (sizeOfRecv > 0)
+            {
+                if (dstPort != -1)
+                {
+                    int s_client = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+                    sockaddr_in dstAddress;
+                    memset(&dstAddress, 0, sizeof(sockaddr_in));
+                    dstAddress.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+                    dstAddress.sin_port = htons(dstPort);
+                    dstAddress.sin_family = AF_INET;
+
+                    sendto(s_client, (char *)message, sizeOfRecv, 0, (const sockaddr *)&dstAddress, sizeof(dstAddress));
+                }
+                else
+                {
+                    std::cout << message << std::endl;
+                }
+            }
+        }
+    }
+}
+
 void connectUDP(std::string ip, int port, bool isFileMessage)
 {
     sockaddr_in addr;
