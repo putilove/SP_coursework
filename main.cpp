@@ -41,6 +41,11 @@ int main(int argc, char *argv[])
             std::cout << "connect udp" << std::endl;
             connectUDP(std::string(argv[2]), atoi(argv[3]), false);
         }
+        else if (strcmp(argv[1], "-cf") == 0)
+        {
+            std::cout << "connect file" << std::endl;
+            connectTCP(std::string(argv[2]), atoi(argv[3]), true);
+        }
         else if (strcmp(argv[1], "-c") == 0)
         {
             std::cout << "connect" << std::endl;
