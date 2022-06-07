@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(argv[1], "-lr") == 0)
         {
-            std::cout << "listen udp redirect" << std::endl;
+            std::cout << "listen tcp redirect" << std::endl;
             listeningTCP(atoi(argv[2]), false, atoi(argv[3]));
         }
         else if (strcmp(argv[1], "-cuf") == 0)
