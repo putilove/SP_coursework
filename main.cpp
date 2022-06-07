@@ -3,10 +3,6 @@
 
 int main(int argc, char *argv[])
 {
-    for (int i = 0; i < argc; i++)
-    {
-        std::cout << argv[i] << std::endl;
-    }
     if (argc == 3){
         if (strcmp(argv[1], "-luf") == 0)
         {
@@ -18,6 +14,16 @@ int main(int argc, char *argv[])
             std::cout << "listen udp" << std::endl;
             listeningUDP(atoi(argv[2]), false, -1);
         }
+        else if (strcmp(argv[1], "-lf") == 0)
+        {
+            std::cout << "listen file" << std::endl;
+            listeningTCP(atoi(argv[2]), true, -1);
+        }
+        else if (strcmp(argv[1], "-l") == 0)
+        {
+            std::cout << "listen" << std::endl;
+            listeningTCP(atoi(argv[2]), false, -1);
+        }
     }
     else if (argc == 4)
     {
@@ -26,10 +32,20 @@ int main(int argc, char *argv[])
             std::cout << "listen udp file redirect" << std::endl;
             listeningUDP(atoi(argv[2]), true, atoi(argv[3]));
         }
+        else if (strcmp(argv[1], "-lfr") == 0)
+        {
+            std::cout << "listen file redirect" << std::endl;
+            listeningTCP(atoi(argv[2]), true, atoi(argv[3]));
+        }
         else if (strcmp(argv[1], "-lur") == 0)
         {
             std::cout << "listen udp redirect" << std::endl;
             listeningUDP(atoi(argv[2]), false, atoi(argv[3]));
+        }
+        else if (strcmp(argv[1], "-lr") == 0)
+        {
+            std::cout << "listen udp redirect" << std::endl;
+            listeningTCP(atoi(argv[2]), false, atoi(argv[3]));
         }
         else if (strcmp(argv[1], "-cuf") == 0)
         {

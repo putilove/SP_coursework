@@ -20,6 +20,8 @@
 #include <time.h>
 #include <fstream>
 
+void listeningTCP(int srcPort, bool isFileMessage, int dstPort);
+
 void connectTCP(std::string ip, int host, bool isFileMessage);
 
 void listeningUDP(int srcPort, bool isFileMessage, int dstPort);

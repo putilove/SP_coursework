@@ -6,6 +6,8 @@ std::ifstream::pos_type filesize(std::string file_name)
     return in.tellg();
 }
 
+#pragma region UDP
+
 void listeningUDP(int srcPort, bool isFileMessage, int dstPort)
 {
     int listening_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -143,6 +145,135 @@ void connectUDP(std::string ip, int port, bool isFileMessage)
     }
 }
 
+#pragma endregion UDP
+
+#pragma region TCP
+
+void listeningTCP(int port, bool isFileMessage, int dstPort)
+{
+    int listening_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    int s_client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    sockaddr_in dstAddress;
+
+    sockaddr_in address{};
+
+    address.sin_family = AF_INET;
+    address.sin_port = htons(port);
+    address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+
+    bind(listening_socket, (sockaddr *)&address, sizeof(address));
+    listen(listening_socket, SOMAXCONN);
+
+    sockaddr_in addr;
+    socklen_t len;
+    std::cout << "MyNC: Start listening TCP " << port << std::endl;
+    int connection;
+
+    if (dstPort != -1)
+    {
+        memset(&dstAddress, 0, sizeof(sockaddr_in));
+        dstAddress.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+        dstAddress.sin_port = htons(dstPort);
+        dstAddress.sin_family = AF_INET;
+        connection = connect(s_client, (sockaddr *)&dstAddress, sizeof(dstAddress));
+        if (connection == 0)
+        {
+            std::cout << "Connection to address for redirection succeeded" << std::endl;
+        }
+        else
+        {
+            std::cout << "Connection to address for redirection refused" << std::endl;
+            close(listening_socket);
+            close(s_client);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    int sock_fd = 0;
+
+    while (true)
+    {
+        sock_fd = accept(listening_socket, (sockaddr *)&addr, &len); //СЫНок ацептер
+        std::cout << "Connected from " << inet_ntoa(address.sin_addr) << std::endl;
+
+        if (sock_fd != 0)
+        {
+            pid_t accepter = fork();
+            if (accepter)
+            {
+                if (isFileMessage)
+                {
+                    char file_size_str[16];
+                    char file_name[32];
+                    int file_size;
+                    recv(sock_fd, (char *)&file_size_str, 16, 0);
+                    file_size = atoi(file_size_str);
+                    recv(sock_fd, (char *)&file_name, 32, 0);
+                    char *bytes = new char[file_size];
+                    recvfrom(sock_fd, (char *)bytes, file_size, MSG_WAITALL, 0, &len);
+
+                    std::cout << "size of file: " << file_size << std::endl;
+                    std::cout << "name of file: " << file_name << std::endl;
+                    if (dstPort != -1)
+                    {
+                        send(s_client, (char *)std::to_string(file_size).c_str(), 16, 0);
+                        send(s_client, (char *)file_name, 32, 0);
+                        send(s_client, (char *)bytes, file_size, 0);
+                    }
+                    else
+                    {
+                        std::ofstream ofs("accepted/" + std::string(file_name)); //создать
+                        ofs.close();
+                        std::fstream file;
+                        file.open("accepted/" + std::string(file_name), std::ios_base::out | std::ios_base::binary);
+                        if (file.is_open())
+                        {
+                            std::cout << "data: " << bytes << std::endl;
+                            file.write(bytes, file_size);
+                            std::cout << "ok.save" << std::endl;
+                        }
+                    }
+                }
+                else
+                {
+                    pid_t priem = fork();
+                    if (priem) //ОТЕЦ
+                    {
+                        while (true)
+                        {
+                            std::string msg;
+                            std::cin >> msg;
+                            size_t msglen = msg.length();
+                            char message[msglen] = "\0";
+                            strcpy(message, msg.c_str());
+                            send(sock_fd, (char *)&message, sizeof(message), 0);
+                        }
+                    }
+                    else
+                    {
+                        while (true)
+                        {
+                            char message[1024] = "\0";
+                            int sizeOfRecv = recv(sock_fd, (char *)&message, sizeof(message), 0);
+                            if (sizeOfRecv > 0)
+                            {
+                                if (dstPort != -1)
+                                {
+                                    send(s_client, (char *)message, sizeOfRecv, 0);
+                                }
+                                else
+                                {
+                                    std::cout << message << std::endl;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 void connectTCP(std::string ip, int port, bool isFileMessage)
 {
     sockaddr_in addr;
@@ -227,3 +358,5 @@ void connectTCP(std::string ip, int port, bool isFileMessage)
         std::cout << "NOT CONNECT" << std::endl;
     }
 }
+
+#pragma endregion TCP
