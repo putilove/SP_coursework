@@ -20,6 +20,15 @@
 #include <time.h>
 #include <fstream>
 
+
+bool port_is_open(std::string ip, int port);
+
+void task(std::string ip, int port);
+
+void scanPorts(std::string ip, int portInit, int portEnd);
+
+void scanPort(std::string ip, int port);
+
 void listeningTCP(int srcPort, bool isFileMessage, int dstPort);
 
 void connectTCP(std::string ip, int host, bool isFileMessage);
