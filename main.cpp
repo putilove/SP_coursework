@@ -68,5 +68,26 @@ int main(int argc, char *argv[])
             connectTCP(std::string(argv[2]), atoi(argv[3]), false);
         }
     }
+    else if (argc == 5)
+    {
+        if (strcmp(argv[1], "-s") == 0)
+        {
+            std::cout << "scanport" << std::endl;
+            scanPorts(argv[2], atoi(argv[3]), atoi(argv[4]));
+        }
+    }
+    else
+    {
+        std::cout << "MyNCAT 1.0" << std::endl;
+        std::cout << "Use IPv4 only" << std::endl;
+        std::cout << "Usage: ./ncat [options] [hostname/port] [port] (port - for redirect)" << std::endl;
+        std::cout << "-c,\t\t\t\t\t\tConnect to [hostname]:[port]" << std::endl;
+        std::cout << "  --u\t\t\t\t\t\tUse UDP instead of default TCP" << std::endl;
+        std::cout << "  --f\t\t\t\t\t\tUse connection for file transfers" << std::endl;
+        std::cout << "-l,\t\t\t\t\t\tBind and listen [port] for incoming connections" << std::endl;
+        std::cout << "  --u\t\t\t\t\t\tUse UDP instead of default TCP" << std::endl;
+        std::cout << "  --f\t\t\t\t\t\tUse connection for file transfers" << std::endl;
+        std::cout << "  --r\t\t\t\t\t\tRedirect data to other port" << std::endl;
+    }
     return 0;
 }
