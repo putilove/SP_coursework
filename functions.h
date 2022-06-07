@@ -48,5 +48,4 @@ void connectUDP(std::string ip, int port, bool isFileMessage);
 
 #pragma endregion UDP
 
-
 std::ifstream::pos_type filesize(std::string file_name);
