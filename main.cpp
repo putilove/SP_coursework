@@ -4,67 +4,31 @@
 int main(int argc, char *argv[])
 {
     if (argc == 3){
-        if (strcmp(argv[1], "-luf") == 0)
+        if (strcmp(argv[1], "-lu") == 0)
         {
-            std::cout << "listen udp file" << std::endl;
-            listeningUDP(atoi(argv[2]), true, -1);
-        }
-        else if (strcmp(argv[1], "-lu") == 0)
-        {
-            std::cout << "listen udp" << std::endl;
             listeningUDP(atoi(argv[2]), false, -1);
-        }
-        else if (strcmp(argv[1], "-lf") == 0)
-        {
-            std::cout << "listen file" << std::endl;
-            listeningTCP(atoi(argv[2]), true, -1);
         }
         else if (strcmp(argv[1], "-l") == 0)
         {
-            std::cout << "listen" << std::endl;
             listeningTCP(atoi(argv[2]), false, -1);
         }
     }
     else if (argc == 4)
     {
-        if (strcmp(argv[1], "-lufr") == 0)
+        if (strcmp(argv[1], "-lur") == 0)
         {
-            std::cout << "listen udp file redirect" << std::endl;
-            listeningUDP(atoi(argv[2]), true, atoi(argv[3]));
-        }
-        else if (strcmp(argv[1], "-lfr") == 0)
-        {
-            std::cout << "listen file redirect" << std::endl;
-            listeningTCP(atoi(argv[2]), true, atoi(argv[3]));
-        }
-        else if (strcmp(argv[1], "-lur") == 0)
-        {
-            std::cout << "listen udp redirect" << std::endl;
             listeningUDP(atoi(argv[2]), false, atoi(argv[3]));
         }
         else if (strcmp(argv[1], "-lr") == 0)
         {
-            std::cout << "listen tcp redirect" << std::endl;
             listeningTCP(atoi(argv[2]), false, atoi(argv[3]));
-        }
-        else if (strcmp(argv[1], "-cuf") == 0)
-        {
-            std::cout << "connect udp file" << std::endl;
-            connectUDP(std::string(argv[2]), atoi(argv[3]), true);
         }
         else if (strcmp(argv[1], "-cu") == 0)
         {
-            std::cout << "connect udp" << std::endl;
             connectUDP(std::string(argv[2]), atoi(argv[3]), false);
-        }
-        else if (strcmp(argv[1], "-cf") == 0)
-        {
-            std::cout << "connect file" << std::endl;
-            connectTCP(std::string(argv[2]), atoi(argv[3]), true);
         }
         else if (strcmp(argv[1], "-c") == 0)
         {
-            std::cout << "connect" << std::endl;
             connectTCP(std::string(argv[2]), atoi(argv[3]), false);
         }
     }
@@ -72,7 +36,6 @@ int main(int argc, char *argv[])
     {
         if (strcmp(argv[1], "-s") == 0)
         {
-            std::cout << "scanport" << std::endl;
             scanPorts(argv[2], atoi(argv[3]), atoi(argv[4]));
         }
     }

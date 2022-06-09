@@ -252,7 +252,7 @@ void connectUDP(std::string ip, int port, bool isFileMessage)
         else
         {
             std::string msg;
-            std::cin >> msg;
+            std::getline(std::cin, msg);
             size_t msglen = msg.length();
             char message[msglen] = "\0";
             strcpy(message, msg.c_str());
@@ -356,12 +356,12 @@ void listeningTCP(int port, bool isFileMessage, int dstPort)
                 else
                 {
                     pid_t pidIn = fork();
-                    if (pidIn)
+                    if (!pidIn)
                     {
                         while (true)
                         {
                             std::string msg;
-                            std::cin >> msg;
+                            std::getline(std::cin, msg);
                             size_t msglen = msg.length();
                             char message[msglen] = "\0";
                             strcpy(message, msg.c_str());
@@ -405,7 +405,6 @@ void connectTCP(std::string ip, int port, bool isFileMessage)
 
     if (connect(connectedSock, (sockaddr *)&addr, sizeof(addr)) == 0)
     {
-        std::cout << "CONNECT" << std::endl;
         if (isFileMessage)
         {
             while (true)
@@ -446,7 +445,7 @@ void connectTCP(std::string ip, int port, bool isFileMessage)
                 while (true)
                 {
                     std::string msg;
-                    std::cin >> msg;
+                    std::getline(std::cin, msg);
                     size_t msglen = 1;
                     msglen = msg.length();
                     char message[msglen] = "\0";
@@ -471,7 +470,7 @@ void connectTCP(std::string ip, int port, bool isFileMessage)
     }
     else
     {
-        std::cout << "NOT CONNECT" << std::endl;
+        exit(EXIT_FAILURE);
     }
 }
 
